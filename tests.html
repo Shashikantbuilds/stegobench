@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StegoBench self-test</title>
+<link rel="icon" href="assets/favicon.png">
+<style>
+  :root{color-scheme:light dark}
+  body{font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;margin:32px auto;max-width:960px;padding:0 16px;color:#0f1b4d;background:#f5f8fe}
+  h1{margin:0 0 4px} p{color:#5b6b8c}
+  table{border-collapse:collapse;width:100%;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(30,64,175,.08)}
+  th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #e8eef9;font-size:14px;color:#0f1b4d}
+  th{background:#eef3fd}
+  .pass{color:#0a8f4e;font-weight:700}.fail{color:#d92d20;font-weight:700}
+  #summary{margin:16px 0;font-weight:700;font-size:18px}
+  button{background:#2563eb;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer}
+  button:disabled{opacity:.6}
+  @media (prefers-color-scheme:dark){body{background:#0d1331;color:#cdd7f2}p{color:#9aa8c9}table{background:#141b3c}th,td{border-color:#2a3563;color:#cdd7f2}th{background:#212b57}.pass{color:#6ee7a0}.fail{color:#ff9b9b}}
+</style>
+</head>
+<body>
+<h1>StegoBench self-test</h1>
+<p>Round trips for every method, codec (Reed-Solomon, CRC, AES-GCM), the STC coder, the attacks, the detectors, the statistics, and a small end-to-end benchmark. Everything runs in this browser tab. The same suite runs headless with <code>npm test</code>.</p>
+<button id="go">Run self-test</button>
+<div id="summary" aria-live="polite"></div>
+<table id="t"><thead><tr><th>Test</th><th>Result</th><th>Detail</th></tr></thead><tbody></tbody></table>
+<script src="js/utils.js"></script>
+<script src="js/codec.js"></script>
+<script src="js/stc.js"></script>
+<script src="js/methods.js"></script>
+<script src="js/attacks.js"></script>
+<script src="js/detectors.js"></script>
+<script src="js/metrics.js"></script>
+<script src="js/job.js"></script>
+<script src="js/worker-src.js"></script>
+<script src="js/benchmark.js"></script>
+<script src="js/sample.js"></script>
+<script src="js/selftest.js"></script>
+<script>
+  const tbody = document.querySelector('#t tbody'), go = document.getElementById('go');
+  go.addEventListener('click', async () => {
+    go.disabled = true; tbody.innerHTML = ''; document.getElementById('summary').textContent = 'Running…';
+    const res = await SB.runSelfTest((name, ok, detail) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td></td><td class="' + (ok ? 'pass' : 'fail') + '">' + (ok ? 'PASS' : 'FAIL') + '</td><td></td>';
+      tr.children[0].textContent = name; tr.children[2].textContent = detail || '';
+      tbody.appendChild(tr);
+    });
+    document.getElementById('summary').innerHTML = res.fail === 0 ? '<span class="pass">ALL ' + res.pass + ' TESTS PASSED</span>' : '<span class="fail">' + res.fail + ' FAILED</span> / ' + res.pass + ' passed';
+    window.__selftest = res; go.disabled = false;
+  });
+</script>
+</body>
+</html>
