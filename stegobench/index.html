@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>StegoBench – Image Steganography Benchmark</title>
+<meta name="description" content="StegoBench hides a secret in an image with 8 methods, attacks it 20 ways, runs 3 detectors and ranks the methods. Everything runs in your browser.">
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+<a class="skip-link" href="#overview">Skip to content</a>
+
+<!-- ===== SVG ICON SPRITE ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/><path d="m14 5-4 14"/></symbol>
+    <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="m7.5 12.5 3 3 6-6.5" stroke="#fff" stroke-width="2.5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z" fill="currentColor" stroke="none"/></symbol>
+  </defs>
+</svg>
+
+<!-- ================= FIXED HEADER ================= -->
+<header class="site-header" id="top">
+  <div class="hdr-inner">
+    <a class="brand" href="index.html" aria-label="StegoBench home">
+      <svg class="logo" viewBox="0 0 48 48" width="44" height="44" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6bf2"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
+        <circle cx="21" cy="21" r="14" fill="none" stroke="url(#lg)" stroke-width="5"/>
+        <path d="M31 31l11 11" stroke="url(#lg)" stroke-width="6" stroke-linecap="round"/>
+        <rect x="14" y="14" width="6" height="6" rx="1.5" fill="url(#lg)"/>
+        <rect x="22" y="14" width="4" height="4" rx="1" fill="url(#lg)" opacity=".6"/>
+        <rect x="14" y="22" width="4" height="4" rx="1" fill="url(#lg)" opacity=".6"/>
+        <rect x="36" y="4" width="5" height="5" rx="1.2" fill="#2f6bf2"/>
+        <rect x="42" y="9" width="3" height="3" rx="1" fill="#7c3aed"/>
+      </svg>
+      <span>Stego<b>Bench</b></span>
+    </a>
+    <nav class="nav" id="siteNav" aria-label="Main">
+      <a href="#overview" data-sec="overview"><svg class="ni" aria-hidden="true"><use href="#i-home"/></svg>Overview</a>
+      <a href="#how" data-sec="how"><svg class="ni" aria-hidden="true"><use href="#i-gear"/></svg>How it works</a>
+      <a href="#attacks" data-sec="attacks"><svg class="ni" aria-hidden="true"><use href="#i-shield"/></svg>Attack steps</a>
+      <a href="#methods" data-sec="methods"><svg class="ni" aria-hidden="true"><use href="#i-layers"/></svg>Methods</a>
+      <a href="#team" data-sec="team"><svg class="ni" aria-hidden="true"><use href="#i-code"/></svg>Developers</a>
+      <a class="btn-primary nav-cta" href="dashboard.html"><svg class="ni" aria-hidden="true"><use href="#i-ext"/></svg>Open Dashboard <svg class="ni" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    </nav>
+    <div class="hdr-actions">
+      <button type="button" class="icon-btn" id="themeBtn" aria-label="Switch colour theme" title="Switch colour theme"><span id="themeIcon" aria-hidden="true">☾</span></button>
+      <button type="button" class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav"><span class="bars" aria-hidden="true"></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ================= HERO ================= -->
+  <section class="hero" id="overview">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow pill"><svg aria-hidden="true"><use href="#i-sparkle"/></svg><span class="e1">Analyze</span><i>•</i><span class="e2">Detect</span><i>•</i><span class="e3">Stay Ahead</span></p>
+        <h1>Which way of hiding a message in an image <span class="grad">actually survives?</span></h1>
+        <p class="lead">Compare <b class="c-blue">8 steganography methods</b>, test <b>20 image attacks</b>, and measure recovery with <b class="c-purple">3 detectors</b>. Runs locally in your browser.</p>
+        <div class="cta-row">
+          <a class="btn-primary big" href="dashboard.html"><svg class="bi" aria-hidden="true"><use href="#i-rocket"/></svg>Open Dashboard <span aria-hidden="true">→</span></a>
+          <a class="btn-ghost big" href="#how"><svg class="bi play" aria-hidden="true"><use href="#i-play"/></svg>See how it works</a>
+        </div>
+        <ul class="trust">
+          <li><svg class="ck" aria-hidden="true"><use href="#i-check"/></svg>100% client side</li>
+          <li><svg class="ck" aria-hidden="true"><use href="#i-check"/></svg>AES-256 encrypted payload</li>
+          <li><svg class="ck" aria-hidden="true"><use href="#i-check"/></svg>Reproducible results</li>
+        </ul>
+      </div>
+
+      <!-- floating artwork: image + password lock -->
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 340 320" width="100%">
+          <defs>
+            <linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+            <linearGradient id="gb" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+            <radialGradient id="gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8b5cf6" stop-opacity=".28"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>
+          </defs>
+          <ellipse cx="190" cy="170" rx="150" ry="130" fill="url(#gl)"/>
+          <ellipse cx="170" cy="190" rx="150" ry="92" transform="rotate(28 170 190)" fill="none" stroke="url(#gb)" stroke-width="1.6"/>
+          <circle cx="40" cy="146" r="5" fill="#22d3ee"/>
+          <circle cx="262" cy="56" r="6" fill="#d946ef"/>
+          <g transform="rotate(-12 150 120)">
+            <rect x="46" y="52" width="190" height="140" rx="18" fill="var(--card)" stroke="url(#ga)" stroke-width="6"/>
+            <rect x="58" y="64" width="166" height="116" rx="10" fill="url(#ga)" opacity=".9"/>
+            <circle cx="112" cy="96" r="12" fill="#fff"/>
+            <path d="M58 170 112 118l34 34 26-26 52 54z" fill="#fff" opacity=".85"/>
+          </g>
+          <g transform="rotate(-8 235 185)">
+            <rect x="150" y="150" width="172" height="72" rx="16" fill="#e6f6ff" stroke="#fff" stroke-width="2"/>
+            <rect x="164" y="170" width="104" height="30" rx="15" fill="#fff"/>
+            <g fill="#2563eb"><circle cx="182" cy="185" r="3.4"/><circle cx="196" cy="185" r="3.4"/><circle cx="210" cy="185" r="3.4"/><circle cx="224" cy="185" r="3.4"/><circle cx="238" cy="185" r="3.4"/><circle cx="252" cy="185" r="3.4"/></g>
+            <rect x="282" y="168" width="30" height="28" rx="7" fill="#10b981"/>
+            <path d="M289 168v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#10b981" stroke-width="4"/>
+            <circle cx="297" cy="182" r="3.4" fill="#fff"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- pipeline card -->
+      <div class="hero-card" aria-label="Pipeline preview">
+        <p class="hc-pill">5 steps, 8 methods, 20 attacks</p>
+        <div class="hc-row"><span class="hc-num n1">1</span><span class="hc-ic"><svg aria-hidden="true"><use href="#i-eye"/></svg></span><div><b>Hide</b><small>secret + passphrase → image</small></div><em class="tag t-blue">8 methods</em></div>
+        <div class="hc-row"><span class="hc-num n2">2</span><span class="hc-ic"><svg aria-hidden="true"><use href="#i-bolt"/></svg></span><div><b>Attack</b><small>JPEG, resize, noise, shift…</small></div><em class="tag t-purple">20 attacks</em></div>
+        <div class="hc-row"><span class="hc-num n3">3</span><span class="hc-ic g"><svg aria-hidden="true"><use href="#i-shield"/></svg></span><div><b>Extract</b><small>same key, error correction</small></div><em class="tag t-green">recovery %</em></div>
+        <div class="hc-row"><span class="hc-num n4">4</span><span class="hc-ic"><svg aria-hidden="true"><use href="#i-trophy"/></svg></span><div><b>Rank</b><small>robust · invisible · stealthy · big</small></div><em class="tag t-purple">leaderboard</em></div>
+      </div>
+    </div>
+
+    <div class="container">
+      <ul class="stats">
+        <li><span class="st-ic s1"><svg aria-hidden="true"><use href="#i-doc"/></svg></span><div><strong>8</strong><b>Methods</b><small>LSB, DCT, Spread Spectrum, F5-style...</small></div></li>
+        <li><span class="st-ic s2"><svg aria-hidden="true"><use href="#i-shield"/></svg></span><div><strong>20</strong><b>Attacks</b><small>JPEG, resize, noise, shift...</small></div></li>
+        <li><span class="st-ic s3"><svg aria-hidden="true"><use href="#i-pulse"/></svg></span><div><strong>3</strong><b>Detectors</b><small>RS, Chi-square, Histogram...</small></div></li>
+        <li><span class="st-ic s4"><svg aria-hidden="true"><use href="#i-trophy"/></svg></span><div><strong>0</strong><b>Login Required</b><small>100% in your browser</small></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="section" id="about">
+    <div class="container">
+      <header class="sec-head">
+        <p class="eyebrow">Project overview</p>
+        <h2>One tool to compare image steganography fairly</h2>
+        <p>Steganography hides a message inside an ordinary-looking image. Choosing a method is a trade-off: a message that survives JPEG compression is usually easier to detect. StegoBench measures that trade-off instead of guessing.</p>
+      </header>
+      <div class="cards">
+        <article class="card reveal"><span class="ic i1" aria-hidden="true">⚖</span><h3>Fair comparison</h3><p>Every method hides the same payload with the same error correction, so the scores are comparable.</p></article>
+        <article class="card reveal"><span class="ic i2" aria-hidden="true">⚡</span><h3>Real-world attacks</h3><p>JPEG, WebP, resizing, noise, blur, shifting, rotation and a social-media re-share chain.</p></article>
+        <article class="card reveal"><span class="ic i3" aria-hidden="true">◎</span><h3>Detectors included</h3><p>RS analysis, Weighted Stego and chi-square show how visible the hidden data is, with ROC curves.</p></article>
+        <article class="card reveal"><span class="ic i4" aria-hidden="true">∑</span><h3>Numbers you can trust</h3><p>Run a whole folder of images: mean ± standard deviation and significance tests, not one lucky result.</p></article>
+        <article class="card reveal"><span class="ic i5" aria-hidden="true">🔒</span><h3>Private by design</h3><p>Images and secrets never leave your device. The secret is encrypted with a passphrase before hiding.</p></article>
+        <article class="card reveal"><span class="ic i6" aria-hidden="true">⟲</span><h3>Reproducible</h3><p>Reports include browser, image hashes and settings, and export to CSV, JSON or PDF.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <section class="section alt" id="how">
+    <div class="container">
+      <header class="sec-head">
+        <p class="eyebrow">How it works</p>
+        <h2>From a secret to a ranked leaderboard in five steps</h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal"><span class="sn">1</span><h3>Choose cover &amp; secret</h3><p>Pick one image or a whole folder. Type a message or choose a file, then set a passphrase.</p></li>
+        <li class="reveal"><span class="sn">2</span><h3>Protect the payload</h3><p>The secret is encrypted (AES-256-GCM), wrapped with a length and checksum, and protected with Reed-Solomon error correction.</p></li>
+        <li class="reveal"><span class="sn">3</span><h3>Hide it</h3><p>Each selected method embeds the bits: LSB variants, DCT, spread spectrum, DWT or content-adaptive S-UNIWARD.</p></li>
+        <li class="reveal"><span class="sn">4</span><h3>Attack and extract</h3><p>The stego image is attacked, then the message is extracted again with the same key and compared with the original.</p></li>
+        <li class="reveal"><span class="sn">5</span><h3>Score &amp; rank</h3><p>Robustness, invisibility, detectability and capacity are combined into a ranking you can reweight for your goal.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= ATTACK STEPS ================= -->
+  <section class="section" id="attacks">
+    <div class="container">
+      <header class="sec-head">
+        <p class="eyebrow">Attack steps</p>
+        <h2>What happens inside one attack test</h2>
+        <p>For every method and every attack, StegoBench repeats the same six steps and records how much of the message survived.</p>
+      </header>
+
+      <div class="atk-grid">
+        <ol class="atk-steps">
+          <li class="reveal"><span class="an">1</span><div><b>Take the stego image</b><p>The image that already contains the hidden bits (lossless PNG, or saved as JPEG QF 90 if you chose the JPEG carrier).</p></div></li>
+          <li class="reveal"><span class="an">2</span><div><b>Apply the attack</b><p>For example a real browser JPEG re-encode at quality 75, a 50% resize, Gaussian noise, or a 3-pixel shift.</p></div></li>
+          <li class="reveal"><span class="an">3</span><div><b>Extract with the same key</b><p>The method reads the bits back from the attacked image. It never sees the original cover (blind extraction).</p></div></li>
+          <li class="reveal"><span class="an">4</span><div><b>Correct errors</b><p>Reed-Solomon decoding repairs flipped bytes when ECC is on, for every method equally.</p></div></li>
+          <li class="reveal"><span class="an">5</span><div><b>Compare with the original</b><p>Recovery is chance-adjusted: a 50% bit match counts as 0%, a perfect match as 100%. A ✓ means the whole message came back.</p></div></li>
+          <li class="reveal"><span class="an">6</span><div><b>Add to the scores</b><p>All attacks average into the robustness score and fill one row of the heat-map.</p></div></li>
+        </ol>
+
+        <div class="fam">
+          <h3>The 20 attacks</h3>
+          <ul class="fam-list">
+            <li><b>JPEG</b><span>QF 90 · 75 · 50 · 30 · double JPEG</span></li>
+            <li><b>Other formats</b><span>WebP quality 80</span></li>
+            <li><b>Resize</b><span>90% · 75% · 50%, then back up</span></li>
+            <li><b>Noise</b><span>Gaussian σ=5 · salt &amp; pepper 1%</span></li>
+            <li><b>Geometry</b><span>Crop 10% · shift 3 px · rotate 1°</span></li>
+            <li><b>Tone</b><span>Brightness +10, contrast ×1.1</span></li>
+            <li><b>Filters</b><span>Blur · median · sharpen</span></li>
+            <li><b>Conversion</b><span>PNG → JPEG 85 → PNG</span></li>
+            <li><b>Re-share chain</b><span>80% scale + JPEG 72, like a messaging app</span></li>
+          </ul>
+          <p class="note">Plus a <b>Breaking points</b> view that raises one attack step by step until each method fails.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= METHODS ================= -->
+  <section class="section alt" id="methods">
+    <div class="container">
+      <header class="sec-head">
+        <p class="eyebrow">Methods</p>
+        <h2>Eight ways to hide data, from simple to state of the art</h2>
+      </header>
+      <div class="methods">
+        <div class="m reveal"><b>Sequential LSB</b><span class="tag">Spatial</span><p>Replaces the lowest bit of the first pixels. Huge capacity, no robustness.</p></div>
+        <div class="m reveal"><b>Random LSB</b><span class="tag">Spatial</span><p>Same, at key-chosen random positions.</p></div>
+        <div class="m reveal"><b>LSB Matching ±1</b><span class="tag">Spatial</span><p>Adds or subtracts 1 instead of overwriting, which defeats the classic chi-square test.</p></div>
+        <div class="m reveal"><b>S-UNIWARD + STC</b><span class="tag">Adaptive</span><p>Puts changes in textured areas using wavelet costs and syndrome-trellis codes.</p></div>
+        <div class="m reveal"><b>DCT (Koch-Zhao)</b><span class="tag">Transform</span><p>Encodes one bit per 8×8 block in the order of two DCT coefficients.</p></div>
+        <div class="m reveal"><b>DCT + Vote</b><span class="tag">Hybrid</span><p>Repeats each bit in several blocks and decodes by majority vote.</p></div>
+        <div class="m reveal"><b>Spread Spectrum</b><span class="tag">Transform</span><p>A faint key-based noise pattern, found again by correlation.</p></div>
+        <div class="m reveal"><b>DWT-QIM (Haar)</b><span class="tag">Transform</span><p>Quantises wavelet coefficients with a secret dither.</p></div>
+      </div>
+
+      <div class="result-card reveal">
+        <div class="rc-head">
+          <h3>What a benchmark looks like</h3>
+          <p>Taken from the built-in validation run: 12 generated images, 60-byte payload, lossless carrier.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>PSNR (dB)</th><th>JPEG QF75 recovery</th><th>3 px shift recovery</th><th>Best detector AUC</th></tr></thead>
+            <tbody>
+              <tr><td>Sequential LSB</td><td>80.0</td><td class="bad">3%</td><td class="bad">2%</td><td>0.61</td></tr>
+              <tr><td>S-UNIWARD + STC</td><td>85.6</td><td class="bad">1%</td><td class="bad">3%</td><td class="good">0.51</td></tr>
+              <tr><td>DCT (Koch-Zhao)</td><td>45.9</td><td class="good">100%</td><td class="bad">4%</td><td>0.56</td></tr>
+              <tr><td>DWT-QIM (Haar)</td><td>40.1</td><td class="good">100%</td><td class="bad">1%</td><td>0.61</td></tr>
+              <tr><td>Spread Spectrum</td><td>38.6</td><td class="good">100%</td><td class="bad">1%</td><td class="bad">0.85</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Robust methods survive JPEG but are easier to detect (AUC 0.5 = a detector can only guess). No method survives a shift. Generated images, so use your own photos in the dashboard for real conclusions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section class="cta-band">
+    <div class="container cta-inner">
+      <div>
+        <h2>Test your own images now</h2>
+        <p>Open the dashboard, load a photo or a folder, and run the benchmark in a couple of minutes.</p>
+      </div>
+      <a class="btn-primary big light" href="dashboard.html">Open Dashboard <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer" id="team">
+  <div class="container">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="index.html"><img src="assets/favicon.png" alt="" width="40" height="40"><span>Stego<b>Bench</b></span></a>
+        <p>Analyze · Detect · Stay Ahead.<br>A client-side benchmark for image steganography.</p>
+        <a class="btn-primary" href="dashboard.html">Open Dashboard <span aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="devs">
+        <h2>Developers</h2>
+        <ul class="dev-list">
+          <li class="dev">
+            <img src="assets/team/dev1.jpg" alt="Portrait of Shashikant" width="120" height="120" loading="lazy">
+            <b>Shashikant</b><span></span>
+          </li>
+          <li class="dev">
+            <img src="assets/team/dev2.jpg" alt="Portrait of Hussain Khan" width="120" height="120" loading="lazy">
+            <b>Jatin Kumar</b><span></span>
+          </li>
+          <li class="dev">
+            <img src="assets/team/dev3.jpg" alt="Portrait of Jatin Kumar" width="120" height="120" loading="lazy">
+            <b>Hussain Khan</b><span></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year">2026</span> StegoBench. Images and secrets never leave your browser.</span>
+      <nav aria-label="Footer"><a href="#overview">Overview</a><a href="#how">How it works</a><a href="#attacks">Attack steps</a><a href="dashboard.html">Dashboard</a></nav>
+    </div>
+  </div>
+</footer>
+
+<script src="js/landing.js"></script>
+</body>
+</html>

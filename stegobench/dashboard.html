@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>StegoBench Dashboard – Image Steganography Benchmark</title>
+<meta name="description" content="Benchmark portal for image steganography: eight methods, 20 attacks, classical steganalysis, dataset statistics. Runs fully in your browser.">
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f80ff"/><stop offset="1" stop-color="#8b3df0"/></linearGradient>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5.2M12 7.6v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M4.5 17l4.6-4.4 3.4 3.2 2.6-2.4 4.4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18.2a4.2 4.2 0 0 1-.6-8.35 5.6 5.6 0 0 1 10.9 1.1A3.65 3.65 0 0 1 17 18.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 20.5v-7.2m0 0-2.6 2.6m2.6-2.6 2.6 2.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6.2L8 21v-3.5H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8.5" cy="11.5" r="1.1" fill="currentColor"/><circle cx="12" cy="11.5" r="1.1" fill="currentColor"/><circle cx="15.5" cy="11.5" r="1.1" fill="currentColor"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="6.5" cy="17.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.9"/><circle cx="17.5" cy="6.5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m8.4 15.6 7.2-7.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.5 21 8l-9 4.5L3 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m3 12 9 4.5 9-4.5M3 16l9 4.5 9-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M4 7.5 12 12l8-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-dice" viewBox="0 0 24 24"><path d="M12 2.8 20 7.4v9.2l-8 4.6-8-4.6V7.4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="9" r="1.2" fill="currentColor"/><circle cx="8.6" cy="12.8" r="1.2" fill="currentColor"/><circle cx="15.4" cy="12.8" r="1.2" fill="currentColor"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12.5h4l2.2-6.5 3.6 12 2.6-8 1.6 2.5h5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-signal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M7.6 7.6a6.2 6.2 0 0 0 0 8.8M16.4 7.6a6.2 6.2 0 0 1 0 8.8M4.6 4.6a10.4 10.4 0 0 0 0 14.8M19.4 4.6a10.4 10.4 0 0 1 0 14.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-shield-check" viewBox="0 0 24 24"><path d="M12 3 5 5.8v5.6c0 4.4 2.8 8 7 9.6 4.2-1.6 7-5.2 7-9.6V5.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.8 12.2 2.3 2.3 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.8 4.2 4.2L18.5 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 5.8v5.6c0 4.4 2.8 8 7 9.6 4.2-1.6 7-5.2 7-9.6V5.8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 3v18.1" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.8v14.4a.8.8 0 0 0 1.2.7l11.6-7.2a.8.8 0 0 0 0-1.4L8.2 4.1A.8.8 0 0 0 7 4.8z" fill="currentColor"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19.5h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.2" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="m15.2 15.2 5 5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8.2a.8.8 0 0 1-.8.8H15v-5.5H9V20H4.8a.8.8 0 0 1-.8-.8z" fill="currentColor"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0zM7.5 6H4.5v1.5A3 3 0 0 0 7.8 10.5M16.5 6h3v1.5a3 3 0 0 1-3.3 3M12 13.5V17m-3.5 3h7M10 17h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M10 3.5 12 9l5.5 2L12 13l-2 5.5L8 13l-5.5-2L8 9zM18.5 3l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1L15.5 6l2.1-.9z" fill="currentColor"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="m4 20 1-4.2L16.6 4.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.2 19zM14.5 6.3l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="18.5" cy="12" r="1.7" fill="currentColor"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2.8 5 13.5h6l-1 7.7 8.5-10.8h-6z" fill="currentColor"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="m3.5 8 4.6 4 3.9-6.5 3.9 6.5 4.6-4-1.6 10.5H5.1z" fill="currentColor"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z" fill="currentColor"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M15.5 6.2a3 3 0 0 1 0 5.6M17 14.2A5.5 5.5 0 0 1 20.5 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M18.7 5.3l-1.9 1.9M7.2 16.8l-1.9 1.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m7.5 15 3.5-4.5 3 2.5 4.5-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6.5 3.5h7l4 4v13h-11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M13.5 3.5v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  </defs>
+</svg>
+
+<a class="skip-link" href="#step1">Skip to benchmark</a>
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <a class="side-logo" href="index.html" aria-label="StegoBench overview page" title="Back to overview"><img src="assets/favicon.png" alt="" width="64" height="64"></a>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <a href="index.html" title="Project overview page"><i><svg><use href="#i-info"/></svg></i>Overview</a>
+      <a href="#home" class="active" data-nav="home"><i><svg><use href="#i-home"/></svg></i>Home</a>
+      <a href="#step2" data-nav="step2"><i><svg><use href="#i-cube"/></svg></i>Methods</a>
+      <a href="#leaderboard" data-nav="leaderboard"><i><svg><use href="#i-trophy"/></svg></i>Results</a>
+      <a href="#deep" data-nav="deep"><i><svg><use href="#i-chart"/></svg></i>Deep analysis</a>
+      <a href="#extractCard" data-nav="extractCard"><i><svg><use href="#i-search"/></svg></i>Extract</a>
+      <button type="button" id="openSettings"><i><svg><use href="#i-gear"/></svg></i>Settings</button>
+      <button type="button" id="themeBtn" aria-label="Switch colour theme"><i><svg id="themeIcon"><use href="#i-moon"/></svg></i><span id="themeLabel">Dark mode</span></button>
+    </nav>
+    <div class="side-card">
+      <svg class="sc-spark"><use href="#i-sparkle"/></svg>
+      <b>StegoBench</b>
+      <small>Smarter steganography analysis, right in your browser.</small>
+      <svg class="sc-wave" viewBox="0 0 120 60" preserveAspectRatio="none"><path d="M0 60V38C20 18 34 46 54 30S92 4 120 22V60z" fill="#b9a5ff" opacity=".55"/><path d="M0 60V46C24 30 44 52 68 40S100 24 120 36V60z" fill="#8f7dff" opacity=".5"/></svg>
+    </div>
+  </aside>
+
+  <div class="content" id="home">
+    <!-- ============ HEADER ============ -->
+    <header class="hero">
+      <svg class="hero-art" viewBox="0 0 900 200" preserveAspectRatio="xMaxYMin slice" aria-hidden="true">
+        <defs><linearGradient id="h1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6aa8ff" stop-opacity=".55"/><stop offset="1" stop-color="#b38cff" stop-opacity=".65"/></linearGradient>
+        <linearGradient id="h2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8ab8ff" stop-opacity=".25"/><stop offset="1" stop-color="#a98bff" stop-opacity=".5"/></linearGradient></defs>
+        <path d="M0 200V130C120 90 230 150 360 110S600 20 700 70s140 20 200-20V200z" fill="url(#h2)"/>
+        <path d="M480 200 640 28 760 120 820 70 900 150V200z" fill="url(#h1)"/>
+        <path d="M600 200 720 64 840 200z" fill="#fff" opacity=".18"/>
+      </svg>
+      <div class="hero-inner">
+        <div class="hero-text">
+          <h1>Stego<span>Bench</span></h1>
+          <p class="hero-tag">Analyze <i>•</i> Detect <i>•</i> Stay Ahead</p>
+          <p class="hero-desc">Eight embedding methods, twenty attacks and three classical steganalysis detectors, measured on one image or a whole folder. Runs fully in your browser.</p>
+        </div>
+        <div class="privacy">
+          <span class="pill"><i class="dot"></i>100% Client Side<span class="pill-ic"><svg><use href="#i-shield"/></svg></span></span>
+          <span class="nodata"><svg><use href="#i-lock"/></svg>No data leaves your browser</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+
+      <!-- ============ STEP 1 ============ -->
+      <section class="card" id="step1">
+        <div class="card-head">
+          <span class="badge">1</span>
+          <div><h2>Carrier &amp; payload</h2><p>Choose cover images, then the secret and how it is protected.</p></div>
+        </div>
+        <div class="s1-grid">
+          <div class="s1-left">
+            <div class="panel">
+              <div class="field-head">
+                <span class="tile blue"><svg><use href="#i-image"/></svg></span>
+                <div><b>Cover images <span class="info" tabindex="0" role="note" data-tip="Single image: quick look. Dataset: many images, so every score gets a mean ± standard deviation and detectors get a real ROC curve. Large images are scaled to the working size in Settings."><svg><use href="#i-info"/></svg></span></b>
+                <small>PNG, JPG or BMP &nbsp;•&nbsp; <span class="tiny">max 10&nbsp;MB each</span></small></div>
+              </div>
+              <div class="seg" role="radiogroup" aria-label="Cover mode" id="modeSeg">
+                <button type="button" role="radio" aria-checked="true" data-mode="single" class="on">One image</button>
+                <button type="button" role="radio" aria-checked="false" data-mode="dataset">Dataset (many images)</button>
+              </div>
+              <label class="drop" id="dropzone" tabindex="0">
+                <input type="file" id="fileInput" accept="image/png,image/jpeg,image/bmp,.png,.jpg,.jpeg,.bmp" hidden>
+                <svg class="drop-ic"><use href="#i-cloud"/></svg>
+                <span class="drop-main" id="dropMain">Choose file</span>
+                <span class="drop-sub" id="dropSub">or drag and drop</span>
+              </label>
+              <div class="filerow hidden" id="fileRow">
+                <span class="thumb"><canvas id="fileThumb" width="56" height="56"></canvas></span>
+                <span class="fmeta"><b id="fileName">sample.png</b><small id="fileMeta"></small></span>
+                <span class="fstatus"><i class="okdot"><svg><use href="#i-check"/></svg></i>Loaded</span>
+                <button type="button" class="dotsbtn" id="clearFile" title="Remove images" aria-label="Remove images"><svg><use href="#i-dots"/></svg></button>
+              </div>
+              <div class="samplebtns">
+                <button type="button" class="samplebtn" id="sampleBtn"><svg><use href="#i-sparkle"/></svg>Use a generated sample image</button>
+                <button type="button" class="samplebtn hidden" id="sampleSetBtn"><svg><use href="#i-sparkle"/></svg>Generate 12 sample images</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="s1-right">
+            <div class="frow">
+              <span class="tile purple"><svg><use href="#i-chat"/></svg></span>
+              <div class="fbody">
+                <div class="lblrow"><b>Secret payload <span class="info" tabindex="0" role="note" data-tip="What gets hidden. Text is UTF-8. A file works too (up to 64 KB); only methods with enough capacity will run."><svg><use href="#i-info"/></svg></span></b>
+                  <div class="seg small" role="radiogroup" aria-label="Payload type" id="payloadSeg">
+                    <button type="button" role="radio" aria-checked="true" data-ptab="text" class="on">Text</button>
+                    <button type="button" role="radio" aria-checked="false" data-ptab="file">File</button>
+                  </div></div>
+                <div class="ta-wrap" id="textPane">
+                  <label class="sr" for="message">Secret message</label>
+                  <textarea id="message" maxlength="2000" spellcheck="false">meet me at 6</textarea>
+                  <span class="counter"><span id="msgCount">0/2000</span><svg><use href="#i-pencil"/></svg></span>
+                </div>
+                <div class="hidden" id="filePane">
+                  <label class="sr" for="payloadFile">Payload file</label>
+                  <input type="file" id="payloadFile">
+                  <p class="hint" id="payloadFileInfo">Choose any file up to 64 KB.</p>
+                </div>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="tile green"><svg><use href="#i-key"/></svg></span>
+              <div class="fbody">
+                <label for="pass"><b>Passphrase <span class="info" tabindex="0" role="note" data-tip="Turned into a 128-bit position seed and an AES-256 key with PBKDF2-SHA-256 (150,000 rounds). Extraction with another passphrase fails."><svg><use href="#i-info"/></svg></span></b></label>
+                <input id="pass" type="text" value="correct horse battery" autocomplete="off" spellcheck="false">
+                <label class="check"><input type="checkbox" id="encrypt" checked><span>Encrypt payload with AES-256-GCM first</span></label>
+              </div>
+            </div>
+            <div class="frow">
+              <span class="tile violet"><svg><use href="#i-layers"/></svg></span>
+              <div class="fbody grid3">
+                <div>
+                  <label for="ecc"><b>Error correction <span class="info" tabindex="0" role="note" data-tip="Reed-Solomon over GF(256) applied to every method equally, so robust and fragile methods are compared on the same footing. It costs capacity."><svg><use href="#i-info"/></svg></span></b></label>
+                  <div class="select-wrap"><select id="ecc"><option value="0">Off</option><option value="32" selected>Light (RS +32 B / block)</option><option value="96">Strong (RS +96 B / block)</option></select></div>
+                </div>
+                <div>
+                  <label for="carrier"><b>Carrier format <span class="info" tabindex="0" role="note" data-tip="Lossless: the stego image stays PNG/BMP. JPEG: it is re-encoded at QF 90 before the attacks. Both: every method runs on both."><svg><use href="#i-info"/></svg></span></b></label>
+                  <div class="select-wrap"><select id="carrier"><option value="lossless">PNG / BMP (lossless)</option><option value="jpeg">JPEG (QF 90)</option><option value="both">Both formats</option></select></div>
+                </div>
+                <div>
+                  <label for="trials"><b>Keys per image <span class="info" tabindex="0" role="note" data-tip="Repeats every run with a different derived key (and fresh encryption nonce) so the result does not depend on one lucky key."><svg><use href="#i-info"/></svg></span></b></label>
+                  <input id="trials" type="number" min="1" max="5" step="1" value="1">
+                </div>
+              </div>
+            </div>
+            <p class="hint" id="payloadInfo"></p>
+          </div>
+        </div>
+        <p class="notice hidden" id="notice" role="alert"></p>
+      </section>
+
+      <!-- ============ STEP 2 ============ -->
+      <section class="card" id="step2">
+        <div class="card-head">
+          <span class="badge">2</span>
+          <div><h2>Methods &amp; run</h2><p>Pick the methods and the attack set, then run the benchmark.</p></div>
+          <div class="menu-host presets no-print">
+            <button type="button" class="btn ghost" id="presetBtn" aria-haspopup="true" aria-expanded="false"><svg><use href="#i-bolt"/></svg>Quick presets<span class="chev"></span></button>
+            <div class="menu hidden" id="presetMenu" role="menu">
+              <button type="button" role="menuitem" data-preset="all">All methods</button>
+              <button type="button" role="menuitem" data-preset="spatial">Spatial (LSB family)</button>
+              <button type="button" role="menuitem" data-preset="stealth">Stealth-oriented (LSB±1, S-UNIWARD)</button>
+              <button type="button" role="menuitem" data-preset="robust">Robust set (DCT, DCT+Vote, Spread, DWT)</button>
+            </div>
+          </div>
+        </div>
+        <div class="methods" id="methodList"></div>
+        <div class="runopts">
+          <label for="attackSet"><b>Attack set</b></label>
+          <div class="select-wrap inline"><select id="attackSet"><option value="full" selected>Full – 20 attacks</option><option value="quick">Quick – 7 attacks</option></select></div>
+          <span class="hint" id="jobHint"></span>
+        </div>
+        <div class="runrow">
+          <button type="button" class="run" id="runBtn" disabled><svg><use href="#i-play"/></svg>Run benchmark</button>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressTrack"><i id="progressFill"></i></div>
+          <span class="status" id="statusText" aria-live="polite"><i class="okdot hidden" id="statusOk"><svg><use href="#i-check"/></svg></i><svg id="statusIc"><use href="#i-image"/></svg><span id="statusLabel">Load an image to start</span></span>
+        </div>
+      </section>
+
+      <!-- ============ STEP 3 : RESULTS ============ -->
+      <section class="card" id="leaderboard">
+        <div class="card-head">
+          <span class="badge">3</span>
+          <div><h2>Leaderboard</h2><p>Ranked by the goal you pick. Change the goal to re-rank instantly.</p></div>
+          <div class="actions no-print">
+            <div class="select-wrap goal"><svg class="goal-ic"><use href="#i-trophy"/></svg>
+              <select id="goal" aria-label="Ranking goal"></select></div>
+            <div class="menu-host">
+              <button type="button" class="btn ghost" id="dlBtn" aria-haspopup="true" aria-expanded="false"><svg><use href="#i-download"/></svg>Download report</button>
+              <div class="menu right hidden" id="dlMenu" role="menu">
+                <button type="button" role="menuitem" id="dlCsv">CSV (table)</button>
+                <button type="button" role="menuitem" id="dlJson">JSON (full data + reproducibility card)</button>
+                <button type="button" role="menuitem" id="dlPdf">PDF (print dialog)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty" id="lbEmpty">Run a benchmark to see the leaderboard.</div>
+        <div class="hidden" id="lbBody">
+          <div class="tiles" id="tiles"></div>
+          <div class="table-wrap"><table id="lbTable"></table></div>
+          <p class="hint" id="lbHint"></p>
+
+          <h3>Trade-off map</h3>
+          <p class="hint">Robustness against imperceptibility. Bubble size is capacity; a ring marks methods that no other method beats on all four scores.</p>
+          <canvas id="paretoChart" class="chart" data-h="340" role="img" aria-label="Scatter plot of robustness against imperceptibility for each method"></canvas>
+          <div class="legend" id="paretoLegend"></div>
+
+          <h3>Recommendations</h3>
+          <ul class="recs" id="recs"></ul>
+
+          <details class="more" id="statsDetails">
+            <summary>Is the ranking reliable? Statistics</summary>
+            <div id="statsBody"></div>
+          </details>
+          <details class="more">
+            <summary>How the scores are calculated</summary>
+            <div class="guide">
+              <p><b>Recovery</b> = chance-adjusted bit recovery of the framed payload after the attack and error correction (50 % match = 0 %, 100 % = exact). <b>Robustness</b> = mean recovery over all supported attacks.</p>
+              <p><b>Imperceptibility</b> = 70 % PSNR (30 dB → 0, 60 dB → 100) + 30 % SSIM (11×11 Gaussian window; 0.95 → 0, 1.00 → 100).</p>
+              <p><b>Stealth</b> = 100 − detection risk. With fewer than 12 image-key samples the risk is a heuristic: 30 % visible distortion, 50 % strongest of RS / Weighted Stego / progressive chi-square (each measured against the cover), 20 % growth of high-frequency noise. With 12 or more samples it comes from the measured ROC area of the best classical detector: stealth = 100 × (1 − max(0, 2·AUC − 1)).</p>
+              <p><b>Capacity</b> = log-scaled maximum payload. <b>Overall</b> = weighted sum with the weights of the selected goal. “#1 in x %” re-ranks 600 random weightings to show how much the winner depends on the weights you chose.</p>
+              <p>RS, WS and chi-square target LSB <i>replacement</i>. They are classical detectors, not trained steganalysers (SRM, SRNet): treat “undetected” as “not caught by these tests”. See the README for cross-checking with Aletheia.</p>
+            </div>
+          </details>
+          <details class="more" id="reproDetails">
+            <summary>Reproducibility card</summary>
+            <pre class="repro" id="reproBody"></pre>
+          </details>
+        </div>
+      </section>
+
+      <!-- ============ STEP 4 : ATTACKS ============ -->
+      <section class="card hidden" id="attackCard">
+        <div class="card-head">
+          <span class="badge">4</span>
+          <div><h2>Attack simulation</h2><p id="attackSub">Chance-adjusted recovery per attack (50 % bit match = 0 %, ✓ = whole message recovered).</p></div>
+        </div>
+        <div class="table-wrap"><table id="attackTable" class="heat"></table></div>
+        <h3>Robustness by attack family</h3>
+        <div class="table-wrap"><table id="groupTable" class="heat"></table></div>
+        <h3>Inspect output</h3>
+        <div class="inspect-bar no-print">
+          <label for="inspectSel">Method</label>
+          <div class="select-wrap inline"><select id="inspectSel"></select></div>
+          <button type="button" class="btn" id="dlStego"><svg><use href="#i-download"/></svg>Download stego image (PNG)</button>
+        </div>
+        <div class="imgs">
+          <figure><canvas id="cvCover" tabindex="0" aria-label="Cover image"></canvas><figcaption>Cover</figcaption></figure>
+          <figure><canvas id="cvStego" tabindex="0" aria-label="Stego image"></canvas><figcaption>Stego</figcaption></figure>
+          <figure><canvas id="cvDiff" tabindex="0" aria-label="Amplified difference"></canvas><figcaption>Difference ×<span id="diffGain">20</span></figcaption></figure>
+        </div>
+        <p class="hint">Hover, touch or use the arrow keys on any image: the same 40×40 pixel area is magnified below (shift + arrow moves faster).</p>
+        <div class="imgs zooms">
+          <figure><canvas id="zmCover" width="200" height="200" aria-hidden="true"></canvas><figcaption>Cover (5×)</figcaption></figure>
+          <figure><canvas id="zmStego" width="200" height="200" aria-hidden="true"></canvas><figcaption>Stego (5×)</figcaption></figure>
+          <figure><canvas id="zmDiff" width="200" height="200" aria-hidden="true"></canvas><figcaption>Difference (5×)</figcaption></figure>
+        </div>
+        <p class="hint" id="recoveredLine"></p>
+      </section>
+
+      <!-- ============ STEP 5 : DEEP ANALYSIS ============ -->
+      <section class="card" id="deep">
+        <div class="card-head">
+          <span class="badge">5</span>
+          <div><h2>Deep analysis</h2><p>Questions a single run cannot answer: what happens as the payload grows, where each method breaks, and what a detector sees.</p></div>
+        </div>
+        <div class="tabs no-print" role="tablist" aria-label="Deep analysis">
+          <button type="button" role="tab" aria-selected="true" class="on" data-dtab="sweep">Payload sweep</button>
+          <button type="button" role="tab" aria-selected="false" data-dtab="break">Breaking points</button>
+          <button type="button" role="tab" aria-selected="false" data-dtab="detect">Detection</button>
+        </div>
+
+        <div id="dp-sweep" role="tabpanel">
+          <p class="hint">Embeds random payloads of increasing size (bits per pixel) with the methods ticked in step 2, then applies one attack. Uses up to three of your cover images, no encryption or ECC, so it shows the raw channel.</p>
+          <div class="inspect-bar no-print">
+            <label for="sweepAttack">Attack</label>
+            <div class="select-wrap inline"><select id="sweepAttack"></select></div>
+            <button type="button" class="btn" id="sweepRun" disabled><svg><use href="#i-play"/></svg>Run payload sweep</button>
+            <span class="hint" id="sweepStatus"></span>
+          </div>
+          <div class="chart-pair">
+            <div><h4>Recovery after the attack</h4><canvas id="sweepChartA" class="chart" data-h="300" role="img" aria-label="Recovery against payload size"></canvas></div>
+            <div><h4>Image quality (PSNR)</h4><canvas id="sweepChartB" class="chart" data-h="300" role="img" aria-label="PSNR against payload size"></canvas></div>
+          </div>
+          <div class="legend" id="sweepLegend"></div>
+        </div>
+
+        <div id="dp-break" role="tabpanel" class="hidden">
+          <p class="hint">Applies one attack at increasing strength to a fixed 24-byte payload and plots how much of it survives. The drop-off point is the method’s breaking point.</p>
+          <div class="inspect-bar no-print">
+            <label for="bpType">Attack</label>
+            <div class="select-wrap inline"><select id="bpType"></select></div>
+            <button type="button" class="btn" id="bpRun" disabled><svg><use href="#i-play"/></svg>Run breaking-point curves</button>
+            <span class="hint" id="bpStatus"></span>
+          </div>
+          <canvas id="bpChart" class="chart" data-h="340" role="img" aria-label="Recovery against attack strength"></canvas>
+          <div class="legend" id="bpLegend"></div>
+        </div>
+
+        <div id="dp-detect" role="tabpanel" class="hidden">
+          <div class="empty" id="detEmpty">Run a benchmark first.</div>
+          <div class="hidden" id="detBody">
+            <p class="hint" id="detNote"></p>
+            <div class="table-wrap"><table id="detTable"></table></div>
+            <h4>ROC curves (best classical detector per method)</h4>
+            <canvas id="rocChart" class="chart" data-h="340" role="img" aria-label="ROC curves of the best detector for each method"></canvas>
+            <div class="legend" id="rocLegend"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ STEP 6 : EXTRACT ============ -->
+      <section class="card no-print" id="extractCard">
+        <div class="card-head">
+          <span class="badge">6</span>
+          <div><h2>Extract &amp; verify</h2><p>Load a stego image you downloaded and read the hidden payload back. The checksum tells you whether it worked.</p></div>
+        </div>
+        <div class="extract-grid">
+          <div><label for="exFile"><b>Stego image</b></label><input type="file" id="exFile" accept="image/png,image/bmp,image/jpeg"></div>
+          <div><label for="exMethod"><b>Method</b></label><div class="select-wrap"><select id="exMethod"></select></div></div>
+          <div><label for="exPass"><b>Passphrase</b></label><input type="text" id="exPass" value="correct horse battery" autocomplete="off" spellcheck="false"></div>
+          <div><label for="exLen"><b>Frame length (bytes)</b></label><input type="number" id="exLen" value="48" min="8" max="70000"></div>
+          <div><label for="exEcc"><b>Error correction</b></label><div class="select-wrap"><select id="exEcc"><option value="0">Off</option><option value="32" selected>Light (+32)</option><option value="96">Strong (+96)</option></select></div></div>
+          <div class="ex-btn"><button type="button" class="btn" id="exBtn"><svg><use href="#i-search"/></svg>Extract</button></div>
+        </div>
+        <div class="chips" id="exChips"></div>
+        <pre class="exout" id="exOut">Extracted text will appear here.</pre>
+        <button type="button" class="btn hidden" id="exDownload"><svg><use href="#i-download"/></svg>Save extracted file</button>
+      </section>
+
+      <footer class="foot">StegoBench v<span id="verTxt"></span> · client-side image steganography benchmark · no uploads, no server</footer>
+    </main>
+  </div>
+</div>
+
+<!-- ============ SETTINGS ============ -->
+<dialog id="settings">
+  <form method="dialog">
+    <h2>Settings</h2>
+    <label for="maxSide"><b>Working image size</b></label>
+    <div class="select-wrap"><select id="maxSide">
+      <option value="256">256 px (very fast, large datasets)</option>
+      <option value="512">512 px (matches BOSSbase)</option>
+      <option value="768">768 px</option>
+      <option value="1024" selected>1024 px (default)</option>
+      <option value="1536">1536 px (slow)</option>
+    </select></div>
+    <p class="hint">Covers are scaled so the longest side is at most this many pixels. Bigger images hold more data but take longer.</p>
+    <label class="check"><input type="checkbox" id="useWorkers" checked><span>Run in parallel Web Workers</span></label>
+    <p class="hint">Needs <code>js/worker-src.js</code>. If you edit the code in <code>js/</code>, run <code>node build.js</code> to regenerate it, or untick this box to use the page thread.</p>
+    <div class="dlg-actions"><button class="btn" value="close">Done</button></div>
+  </form>
+</dialog>
+
+<script src="js/utils.js"></script>
+<script src="js/codec.js"></script>
+<script src="js/stc.js"></script>
+<script src="js/methods.js"></script>
+<script src="js/attacks.js"></script>
+<script src="js/detectors.js"></script>
+<script src="js/metrics.js"></script>
+<script src="js/job.js"></script>
+<script src="js/worker-src.js"></script>
+<script src="js/benchmark.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/sample.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
