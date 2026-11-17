@@ -1,54 +1,54 @@
-/* StegoBench landing page: theme, mobile menu, header shadow, active link, reveal on scroll */
+/* StegoBench landing page: theme, mobile menu, active link, reveal on scroll, count-up. */
 (function () {
   'use strict';
-  const $ = (id) => document.getElementById(id);
-  document.documentElement.classList.add('js');
+  var root = document.documentElement, $ = function (id) { return document.getElementById(id); };
+  root.classList.add('js');
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* theme (shares the dashboard's saved choice) */
-  const root = document.documentElement;
-  function applyTheme(t) {
+  function setTheme(t) {
     root.dataset.theme = t;
-    $('themeIcon').textContent = t === 'dark' ? '☀' : '☾';
-    $('themeBtn').setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    var ic = $('themeIcon'); if (ic) ic.textContent = t === 'dark' ? 'Light' : 'Dark';
+    var b = $('themeBtn'); if (b) b.setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
   }
-  let saved = null;
-  try { saved = localStorage.getItem('stegobench-theme'); } catch (e) { /* storage blocked */ }
-  applyTheme(saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-  $('themeBtn').addEventListener('click', () => {
-    const n = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  var saved = null; try { saved = localStorage.getItem('stegobench-theme'); } catch (e) { /* storage blocked */ }
+  setTheme(saved || 'light');
+  if ($('themeBtn')) $('themeBtn').addEventListener('click', function () {
+    var n = root.dataset.theme === 'dark' ? 'light' : 'dark'; setTheme(n);
     try { localStorage.setItem('stegobench-theme', n); } catch (e) { /* ignore */ }
-    applyTheme(n);
   });
 
   /* mobile menu */
-  const nav = $('siteNav'), btn = $('menuBtn');
-  const setMenu = (open) => { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', open); btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); };
-  btn.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
-  nav.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+  var nav = $('siteNav'), mb = $('menuBtn');
+  if (nav && mb) {
+    mb.addEventListener('click', function () { var o = nav.classList.toggle('open'); mb.setAttribute('aria-expanded', String(o)); });
+    nav.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a')) { nav.classList.remove('open'); mb.setAttribute('aria-expanded', 'false'); } });
+  }
 
-  /* header shadow once scrolled */
-  const hdr = document.querySelector('.site-header');
-  const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 8);
-  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+  if ($('year')) $('year').textContent = String(new Date().getFullYear());
 
-  /* active nav link */
-  const links = [...nav.querySelectorAll('a[data-sec]')];
-  if ('IntersectionObserver' in window) {
-    const map = { overview: 'overview', about: 'overview', how: 'how', attacks: 'attacks', methods: 'methods', team: 'team' };
-    const io = new IntersectionObserver((es) => es.forEach((e) => {
-      if (e.isIntersecting) links.forEach((a) => a.classList.toggle('active', a.dataset.sec === map[e.target.id]));
-    }), { rootMargin: '-45% 0px -50% 0px' });
-    Object.keys(map).forEach((id) => { const el = $(id); if (el) io.observe(el); });
+  /* active link */
+  var links = [].slice.call(document.querySelectorAll('a[data-sec]'));
+  if ('IntersectionObserver' in window && links.length) {
+    var so = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle('active', a.dataset.sec === e.target.id); }); });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    links.forEach(function (a) { var s = document.getElementById(a.dataset.sec); if (s) so.observe(s); });
+  }
 
-    /* reveal on scroll (skipped for reduced motion) */
-    const rv = [...document.querySelectorAll('.reveal')];
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) rv.forEach((el) => el.classList.add('in'));
-    else {
-      const ro = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } }), { threshold: 0.12 });
-      rv.forEach((el) => ro.observe(el));
-    }
-  } else document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+  /* reveal (opacity only) */
+  var rv = [].slice.call(document.querySelectorAll('.reveal'));
+  if (calm || !('IntersectionObserver' in window)) rv.forEach(function (e) { e.classList.add('in'); });
+  else {
+    var ro = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } }); }, { threshold: 0.12 });
+    rv.forEach(function (e) { ro.observe(e); });
+  }
 
-  const y = $('year'); if (y) y.textContent = new Date().getFullYear();
+  /* count-up on the four facts */
+  if (!calm) document.querySelectorAll('.facts strong').forEach(function (el) {
+    var n = el.firstChild, m = n && /^\d+/.exec(n.textContent); if (!m) return;
+    var end = parseInt(m[0], 10), rest = n.textContent.slice(m[0].length), t0 = null; if (end < 1) return;
+    function tick(t) { t0 = t0 || t; var p = Math.min(1, (t - t0) / 800); n.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))) + rest; if (p < 1) requestAnimationFrame(tick); }
+    n.textContent = '0' + rest; setTimeout(function () { requestAnimationFrame(tick); }, 300);
+  });
 })();

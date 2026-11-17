@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StegoBench | Which image steganography method survives?</title>
+<meta name="description" content="A browser-only benchmark that tests 8 image steganography methods against 20 attacks and 3 detectors. Nothing is uploaded.">
+<link rel="canonical" href="https://stegobench.site/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="StegoBench">
+<meta property="og:title" content="StegoBench | Which image steganography method survives?">
+<meta property="og:description" content="A browser-only benchmark that tests 8 image steganography methods against 20 attacks and 3 detectors. Nothing is uploaded.">
+<meta property="og:url" content="https://stegobench.site/">
+<meta property="og:image" content="https://stegobench.site/assets/logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="StegoBench | Which image steganography method survives?">
+<meta name="twitter:description" content="A browser-only benchmark that tests 8 image steganography methods against 20 attacks and 3 detectors. Nothing is uploaded.">
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header" id="top">
+  <div class="hdr-inner">
+    <a class="brand" href="index.html" aria-label="StegoBench home"><span class="wm">StegoBench</span><span class="ver">v2.0</span></a>
+    <nav class="nav" id="siteNav" aria-label="Main">
+      <a href="#overview" data-sec="overview">Overview</a>
+      <a href="#how" data-sec="how">Method</a>
+      <a href="#attacks" data-sec="attacks">Attacks</a>
+      <a href="#methods" data-sec="methods">Results</a>
+      <a href="#team" data-sec="team">Developers</a>
+      <a class="nav-cta" href="dashboard.html">Open dashboard</a>
+    </nav>
+    <div class="hdr-actions">
+      <button type="button" class="txt-btn" id="themeBtn" aria-label="Switch colour theme"><span id="themeIcon">Dark</span></button>
+      <button type="button" class="txt-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">Menu</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" id="overview">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <p class="kicker">Image steganography benchmark</p>
+      <h1>Which way of hiding a message in an image <em>actually survives?</em></h1>
+      <p class="lead">Compare 8 methods against 20 attacks and 3 detectors. Runs entirely in your browser.</p>
+      <div class="cta-row">
+        <a class="btn" href="dashboard.html">Open the dashboard</a>
+        <a class="link" href="#how">Read the method</a>
+      </div>
+      <p class="fineprint">Client side only. AES-256-GCM payload. Reed-Solomon error correction.</p>
+    </div>
+
+    <section class="demo" id="demo" aria-label="Live test">
+      <div class="demo-head"><b>Live test</b><span>runs now, in this tab</span></div>
+      <div class="demo-controls">
+        <label>Method <select id="demoMethod"></select></label>
+        <label>Message <input id="demoMsg" type="text" value="meet me at 6" maxlength="24" autocomplete="off"></label>
+        <label class="wide">JPEG quality of the attack: <output id="demoQv">75</output><input id="demoQ" type="range" min="20" max="100" step="5" value="75"></label>
+      </div>
+      <div class="demo-imgs">
+        <figure><canvas id="demoCover" width="320" height="240"></canvas><figcaption>Original cover</figcaption></figure>
+        <figure><canvas id="demoStego" width="320" height="240"></canvas><figcaption>After hiding and attacking</figcaption></figure>
+      </div>
+      <div class="demo-out" aria-live="polite">
+        <span class="lab">Recovered message</span>
+        <div id="demoText" class="skel-line"></div>
+        <span id="demoStat" class="stat"></span>
+      </div>
+    </section>
+  </div>
+  <div class="container">
+    <ul class="facts">
+      <li><strong>8</strong><span>methods compared</span></li>
+      <li><strong>20</strong><span>attacks applied</span></li>
+      <li><strong>3</strong><span>detectors run</span></li>
+      <li><strong>0 <small>bytes</small></strong><span>uploaded anywhere</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="container">
+    <header class="sec-head"><p class="kicker">Method</p><h2>From a secret to a ranked leaderboard in five steps</h2></header>
+    <ol class="rows">
+      <li class="reveal"><span class="num">1</span><div><h3>Choose cover and secret</h3><p>Pick one image or a whole folder. Type a message or choose a file, then set a passphrase.</p></div></li>
+      <li class="reveal"><span class="num">2</span><div><h3>Protect the payload</h3><p>The secret is encrypted with AES-256-GCM, wrapped with a length and checksum, and given Reed-Solomon error correction.</p></div></li>
+      <li class="reveal"><span class="num">3</span><div><h3>Hide it</h3><p>Each selected method embeds the bits: LSB variants, DCT, spread spectrum, DWT or content-adaptive S-UNIWARD.</p></div></li>
+      <li class="reveal"><span class="num">4</span><div><h3>Attack and extract</h3><p>The stego image is attacked, then the message is read back with the same key and compared with the original.</p></div></li>
+      <li class="reveal"><span class="num">5</span><div><h3>Score and rank</h3><p>Robustness, invisibility, detectability and capacity combine into a ranking you can reweight for your goal.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section alt" id="attacks">
+  <div class="container">
+    <header class="sec-head"><p class="kicker">Attacks</p><h2>What happens inside one attack test</h2><p class="sub">For every method and every attack, StegoBench repeats the same six steps and records how much of the message survived.</p></header>
+    <ol class="rows two">
+      <li class="reveal"><span class="num">1</span><div><h3>Take the stego image</h3><p>The image that already holds the hidden bits, as lossless PNG or saved as JPEG at quality 90.</p></div></li>
+      <li class="reveal"><span class="num">2</span><div><h3>Apply the attack</h3><p>For example a real browser JPEG re-encode at quality 75, a 50% resize, Gaussian noise or a 3-pixel shift.</p></div></li>
+      <li class="reveal"><span class="num">3</span><div><h3>Extract with the same key</h3><p>The method reads the bits back from the attacked image and never sees the original cover.</p></div></li>
+      <li class="reveal"><span class="num">4</span><div><h3>Correct errors</h3><p>Reed-Solomon decoding repairs flipped bytes when error correction is on, equally for every method.</p></div></li>
+      <li class="reveal"><span class="num">5</span><div><h3>Compare with the original</h3><p>Recovery is chance adjusted: a 50% bit match counts as 0%, a perfect match as 100%.</p></div></li>
+      <li class="reveal"><span class="num">6</span><div><h3>Add to the scores</h3><p>All attacks average into the robustness score and fill one cell of the attack heat map.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="methods">
+  <div class="container">
+    <header class="sec-head"><p class="kicker">Results</p><h2>All 8 methods, measured</h2><p class="sub">12 generated covers of 512×384 pixels, a 60-byte AES-GCM payload, 20 attacks. Reproduce it with <code>npm run validate</code>.</p></header>
+    <div class="table-wrap reveal"><table class="mx">
+      <thead><tr><th>Method</th><th>Domain</th><th>PSNR</th><th>JPEG QF75</th><th>Gaussian σ5</th><th>Shift 3 px</th><th>Detectability</th></tr></thead>
+      <tbody>
+<tr><th scope="row">DWT-QIM (Haar)</th><td>Transform</td><td class="n">40.1 dB</td><td class="n hi">100%</td><td class="n hi">100%</td><td class="n lo">1%</td><td class="">Medium <span class="mono">RS 0.61</span></td></tr>
+<tr><th scope="row">DCT + Vote (ECC)</th><td>Hybrid</td><td class="n">41.2 dB</td><td class="n hi">100%</td><td class="n hi">100%</td><td class="n lo">4%</td><td class="">Medium <span class="mono">WS 0.62</span></td></tr>
+<tr><th scope="row">Spread Spectrum</th><td>Transform</td><td class="n">38.6 dB</td><td class="n hi">100%</td><td class="n hi">100%</td><td class="n lo">1%</td><td class="lo">High <span class="mono">WS 0.85</span></td></tr>
+<tr><th scope="row">DCT (Koch-Zhao)</th><td>Transform</td><td class="n">45.9 dB</td><td class="n hi">100%</td><td class="n hi">100%</td><td class="n lo">4%</td><td class="">Medium <span class="mono">RS 0.56</span></td></tr>
+<tr><th scope="row">LSB Matching (±1)</th><td>Spatial</td><td class="n">over 80 dB</td><td class="n lo">2%</td><td class="n lo">4%</td><td class="n lo">1%</td><td class="ok">Low <span class="mono">Chi 0.53</span></td></tr>
+<tr><th scope="row">Random LSB</th><td>Spatial</td><td class="n">over 80 dB</td><td class="n lo">3%</td><td class="n lo">0%</td><td class="n lo">1%</td><td class="ok">Low <span class="mono">WS 0.53</span></td></tr>
+<tr><th scope="row">Sequential LSB</th><td>Spatial</td><td class="n">over 80 dB</td><td class="n lo">3%</td><td class="n lo">0%</td><td class="n lo">2%</td><td class="">Medium <span class="mono">Chi 0.61</span></td></tr>
+<tr><th scope="row">S-UNIWARD + STC</th><td>Adaptive</td><td class="n">85.6 dB</td><td class="n lo">1%</td><td class="n lo">0%</td><td class="n lo">3%</td><td class="ok">Low <span class="mono">RS 0.51</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Frequency-domain methods survive compression but are easier to detect. Spatial methods stay quiet until the image is attacked. The covers are generated images, so use your own photos in the dashboard before drawing conclusions.</p>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer" id="team">
+  <div class="container">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="index.html"><span class="wm">StegoBench</span></a>
+        <p>A client-side benchmark for image steganography. Images and secrets never leave your browser.</p>
+        <a class="btn" href="dashboard.html">Open dashboard</a>
+      </div>
+      <div class="devs">
+        <h2>Developers and contact</h2>
+        <ul class="dev-list">
+          <li class="dev"><b>Shashikant</b><a href="https://www.linkedin.com/in/shashikantbuilds/" target="_blank" rel="noopener noreferrer" aria-label="Shashikant on LinkedIn (opens in a new tab)">LinkedIn</a></li>
+          <li class="dev"><b>Jatin Kumar</b><a href="https://www.linkedin.com/in/jatin-kumar-92902b331/" target="_blank" rel="noopener noreferrer" aria-label="Jatin Kumar on LinkedIn (opens in a new tab)">LinkedIn</a></li>
+          <li class="dev"><b>Hussain Khan</b><a href="https://www.linkedin.com/in/hussain-khan-2209033b8/" target="_blank" rel="noopener noreferrer" aria-label="Hussain Khan on LinkedIn (opens in a new tab)">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year">2026</span> StegoBench</span>
+      <nav aria-label="Footer"><a href="#overview">Overview</a><a href="dashboard.html">Dashboard</a><a href="privacy.html">Privacy policy</a><a href="terms.html">Terms of use</a></nav>
+    </div>
+  </div>
+</footer>
+
+<script src="js/utils.js"></script>
+<script src="js/codec.js"></script>
+<script src="js/stc.js"></script>
+<script src="js/methods.js"></script>
+<script src="js/attacks.js"></script>
+<script src="js/sample.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/landing.js"></script>
+</body>
+</html>

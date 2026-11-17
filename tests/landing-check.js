@@ -1,5 +1,5 @@
 /* Checks the landing page: every local link, script, stylesheet and image exists; every #anchor has a target;
- * header is sticky; the dashboard link is present; developer names and photos are in the footer. */
+ * header is sticky; the dashboard link is present; developer names and LinkedIn links are in the footer. */
 'use strict';
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
@@ -16,7 +16,7 @@ check('Header is sticky and above content', /\.site-header\{position:sticky;top:
 check('Open Dashboard links go to dashboard.html', (html.match(/href="dashboard\.html"/g) || []).length >= 4);
 check('Dashboard page exists and links back to the overview', fs.existsSync(path.join(root, 'dashboard.html')) && /href="index\.html"/.test(fs.readFileSync(path.join(root, 'dashboard.html'), 'utf8')));
 ['Shashikant', 'Hussain Khan', 'Jatin Kumar'].forEach((n) => check('Footer lists ' + n, new RegExp('<b>' + n + '</b>').test(html)));
-check('Three developer photos in the footer', (html.match(/assets\/team\/dev[123]\.jpg/g) || []).length === 3);
+check('Three developer LinkedIn links in the footer', (html.match(/https:\/\/www\.linkedin\.com\/in\/[a-z0-9-]+\//g) || []).length === 3);
 check('No duplicate ids', ids.size === [...html.matchAll(/id="([^"]+)"/g)].length);
 check('Landing JS parses', (() => { try { new Function(fs.readFileSync(path.join(root, 'js/landing.js'), 'utf8')); return true; } catch (e) { return false; } })());
 

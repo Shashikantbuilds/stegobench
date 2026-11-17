@@ -1,0 +1,5 @@
+{
+  "buildCommand": "node build.js",
+  "installCommand": "echo skip-install",
+  "outputDirectory": "."
+}

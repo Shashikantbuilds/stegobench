@@ -24,7 +24,7 @@
   /* ------------------------------------------------------------ helpers */
   const selectedMethods = () => [...document.querySelectorAll('input[name=method]:checked')].map((i) => i.value);
   const f1 = (n) => (Number.isFinite(n) ? n.toFixed(1) : '–');
-  const icon = (id) => `<svg><use href="${id}"/></svg>`;
+  const icon = () => '';   /* no icon set: text only */
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const eccLevel = () => +$('ecc').value;
   const trialsN = () => Math.max(1, Math.min(5, parseInt($('trials').value, 10) || 1));
@@ -65,16 +65,16 @@
     $('sweepRun').disabled = $('bpRun').disabled = !(n && methods.length && pass && !state.running);
 
     if (!state.running && !state.justDone) {
-      if (!n) setStatus('Load an image to start');
-      else if (!methods.length) setStatus('Select at least one method');
-      else if (!pb || !pb.length) setStatus(state.payloadTab === 'file' ? 'Choose a payload file' : 'Enter a secret message');
-      else if (!pass) setStatus('Enter a passphrase');
-      else setStatus(`Ready – ${methods.length} method${methods.length > 1 ? 's' : ''}, ${n} image${n > 1 ? 's' : ''}`);
+      if (!n) setStatus('Start by loading an image');
+      else if (!methods.length) setStatus('Pick at least one method to compare');
+      else if (!pb || !pb.length) setStatus(state.payloadTab === 'file' ? 'Choose a file to hide' : 'Type a secret message to hide');
+      else if (!pass) setStatus('Add a passphrase to protect it');
+      else setStatus(`All set – ${methods.length} method${methods.length > 1 ? 's' : ''}, ${n} image${n > 1 ? 's' : ''}`);
     }
     if (pb && pb.length) {
       const opts = { encrypt: encryptOn(), ecc: eccLevel() };
       const bits = SB.pipeline.bitLength(pb.length, opts);
-      $('payloadInfo').textContent = `${pb.length} B payload → ${SB.frame.overhead(opts.encrypt)} B header/CRC${opts.encrypt ? '/AES-GCM' : ''}${opts.ecc ? ' + RS parity' : ''} → ${bits / 8} B (${bits} bits) hidden per image.`;
+      $('payloadInfo').textContent = `${pb.length} B payload becomes ${SB.frame.overhead(opts.encrypt)} B header/CRC${opts.encrypt ? '/AES-GCM' : ''}${opts.ecc ? ' + RS parity' : ''}, ${bits / 8} B (${bits} bits) hidden per image.`;
       if (n && methods.length && !state.running) {
         const small = state.covers.reduce((a, c) => (c.img.width * c.img.height < a.img.width * a.img.height ? c : a));
         const { width: w, height: h } = small.img;
@@ -190,18 +190,18 @@
       out.coverRef = state.covers[0].img;
       state.last = out; state.sweep = null; state.bp = null; setProgress(100);
       state.running = false; state.justDone = true;
-      setStatus(`Done in ${out.seconds.toFixed(1)} s (${out.workers}). ${out.nImages} image${out.nImages > 1 ? 's' : ''} × ${out.trials} key${out.trials > 1 ? 's' : ''}.`, true);
+      setStatus(`Done in ${out.seconds.toFixed(1)} s, thanks for waiting! (${out.workers}). ${out.nImages} image${out.nImages > 1 ? 's' : ''} × ${out.trials} key${out.trials > 1 ? 's' : ''}.`, true);
       renderAll();
       $('leaderboard').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     } catch (e) {
       console.error(e); state.running = false;
-      showNotice('Benchmark failed: ' + (e && e.message ? e.message : e), true); setStatus('Failed');
+      showNotice('Sorry, the benchmark hit a problem: ' + (e && e.message ? e.message : e), true); setStatus('Failed');
     } finally { state.running = false; refresh(); }
   }
 
   /* --------------------------------------------------------- leaderboard */
   const best = (arr, f, dir) => arr.reduce((a, b) => ((dir || 1) * (f(b) - f(a)) > 0 ? b : a));
-  const heat = (p) => `background:hsl(${Math.round(p * 1.3)} 65% var(--hl,90%));color:hsl(${Math.round(p * 1.3)} 60% var(--hd,24%))`;
+  const heat = (p) => `background:hsl(0 0% var(--hl,90%));color:hsl(0 0% var(--hd,24%))`;
   const okRows = () => state.last.results.filter((r) => r.status === 'ok');
   const label = (r, multi) => r.name + (multi ? ` · ${r.formatLabel}` : '');
   const rankedRows = () => { const ok = okRows(); ok.forEach((r) => { r.overall = SB.overall(r, state.goal); }); return [...ok].sort((a, b) => b.overall - a.overall); };
@@ -218,9 +218,8 @@
     if (!ok.length) {
       $('tiles').innerHTML = ''; $('recs').innerHTML = '';
       $('lbTable').innerHTML = '<tbody><tr><td class="skip">No method could embed this payload: ' + esc(run.results.map((r) => r.name + ' – ' + r.reason).join('; ')) + '</td></tr></tbody>';
-      $('attackCard').classList.add('hidden'); $('paretoChart').classList.add('hidden'); return;
+       return;
     }
-    $('paretoChart').classList.remove('hidden');
     const ranked = rankedRows(), top = ranked[0], rob = best(ok, (r) => r.robustness);
     const stab = SB.rankStability(ranked, 600), par = SB.pareto(ranked);
     const nMethods = new Set(run.results.map((r) => r.id)).size;
@@ -237,7 +236,7 @@
     ranked.forEach((r, i) => {
       const [ic, cl] = ICON[r.id];
       h += `<tr class="${i === 0 ? 'first' : ''}" title="PSNR ${f1(r.psnr)} dB · SSIM ${r.ssim.toFixed(4)} · JPEG QF75 recovery ${f1(r.jpeg75)}% · risk ${r.riskLabel} · n = ${r.n}">` +
-        `<td><span class="rk">${i === 0 ? icon('#i-crown') : i + 1}</span></td>` +
+        `<td><span class="rk">${i + 1}</span></td>` +
         `<td><span class="mname"><i class="${cl}">${icon(ic)}</i>${r.name}${multi ? `<span class="fmt">${r.formatLabel}</span>` : ''}${par[i] ? '<span class="par" title="Pareto-optimal: no other method is at least as good on all four scores">Pareto</span>' : ''}</span></td>` +
         `<td>${r.domain}</td><td>${SB.fmtBytes(r.capacityBytes)}</td>` +
         `<td>${f1(r.quality)}${pm(r, 'quality')}</td><td>${f1(r.robustness)}${pm(r, 'robustness')}</td><td>${f1(r.risk)}${pm(r, 'risk')}</td>` +
@@ -249,13 +248,6 @@
     });
     $('lbTable').innerHTML = h + '</tbody>';
     $('lbHint').textContent = `Goal: ${G.label} (robustness ${G.w[0] * 100}%, imperceptibility ${G.w[1] * 100}%, low detectability ${G.w[2] * 100}%, capacity ${G.w[3] * 100}%). Scores are 0–100; detectability is a risk score, lower is better. ${nSamples > 1 ? 'Values are means; ± is the standard deviation over image/key samples. ' : 'One sample only – use Dataset mode or several keys for error bars. '}Hover a row for PSNR and SSIM.`;
-
-    /* trade-off chart */
-    SB.charts.draw($('paretoChart'), 'scatter', {
-      xlabel: 'Imperceptibility', ylabel: 'Robustness',
-      points: ranked.map((r, i) => ({ x: r.quality, y: r.robustness, r: 6 + r.capScore / 12, color: SB.METHOD_COLOR[r.id], ring: par[i], label: label(r, multi), short: SHORT[r.id] + (multi ? (r.format === 'jpeg' ? ' (J)' : '') : '') })),
-    });
-    $('paretoLegend').innerHTML = legendHTML([...new Set(ranked.map((r) => r.id))].map((id) => ({ name: SB.methodById(id).name, color: SB.METHOD_COLOR[id] })));
 
     /* recommendations */
     const recs = [`<li><b>Top for “${G.label}”:</b> ${esc(label(top, multi))} (${f1(top.overall)}/100)</li>`];
@@ -440,7 +432,7 @@
         ({ done, total }) => { $('sweepStatus').textContent = `Running… ${done}/${total}`; });
       state.sweep = res;
       const ids = Object.keys(res.series);
-      if (!ids.length) { $('sweepStatus').textContent = 'No method fits any of these payload sizes on this image.'; }
+      if (!ids.length) { $('sweepStatus').textContent = 'None of the selected methods can hold these payload sizes in this image. Try a larger image or other methods.'; }
       else {
         $('sweepStatus').textContent = `Done – ${covers.length} image${covers.length > 1 ? 's' : ''}, attack: ${res.attack.label}.`;
         const mk = (f) => ids.map((id) => ({ name: SB.methodById(id).name, color: SB.METHOD_COLOR[id], points: res.series[id].map((p) => ({ x: p.bpp, y: p[f.y], e: f.e ? p[f.e] : 0 })) }));
@@ -448,7 +440,7 @@
         SB.charts.draw($('sweepChartB'), 'line', { series: mk({ y: 'psnr' }), xlog: true, xlabel: 'Payload (bits per pixel, log scale)', ylabel: 'PSNR (dB)', ymin: 20, ymax: 100, xfmt: (v) => +v.toPrecision(2) + '' });
         $('sweepLegend').innerHTML = legendHTML(mk({ y: 'atk' }));
       }
-    } catch (e) { console.error(e); $('sweepStatus').textContent = 'Failed: ' + (e.message || e); }
+    } catch (e) { console.error(e); $('sweepStatus').textContent = 'Failed, sorry about that: ' + (e.message || e); }
     finally { state.running = false; refresh(); }
   }
   async function runBreakpoint() {
@@ -460,12 +452,12 @@
         ({ done, total }) => { $('bpStatus').textContent = `Running… ${done}/${total}`; });
       state.bp = res;
       const ids = Object.keys(res.curves);
-      if (!ids.length) { $('bpStatus').textContent = 'The test payload does not fit any selected method on this image.'; return; }
+      if (!ids.length) { $('bpStatus').textContent = 'Sorry, the test payload does not fit any selected method on this image. Try a larger image or other methods.'; return; }
       $('bpStatus').textContent = `Done – ${eccLevel() ? 'with' : 'without'} error correction, first image.`;
       const series = ids.map((id) => ({ name: SB.methodById(id).name, color: SB.METHOD_COLOR[id], points: res.curves[id].map((v, i) => ({ x: i, y: v })) }));
       SB.charts.draw($('bpChart'), 'line', { series, xcats: res.sweep.values.map((v) => String(v)), xmin: 0, xmax: res.sweep.values.length - 1, xlabel: res.sweep.axis, ylabel: 'Recovery (%)', ymin: 0, ymax: 100 });
       $('bpLegend').innerHTML = legendHTML(series);
-    } catch (e) { console.error(e); $('bpStatus').textContent = 'Failed: ' + (e.message || e); }
+    } catch (e) { console.error(e); $('bpStatus').textContent = 'Failed, sorry about that: ' + (e.message || e); }
     finally { state.running = false; refresh(); }
   }
 
@@ -491,7 +483,7 @@
     if (!f) { out.textContent = 'Choose a stego image first.'; return; }
     const pass = $('exPass').value, len = Math.max(8, Math.min(70000, +$('exLen').value | 0)), nsym = +$('exEcc').value;
     if (!pass) { out.textContent = 'Enter the passphrase.'; return; }
-    out.textContent = 'Working…';
+    out.textContent = 'Working on it…';
     let img;
     try {
       const bmp = await createImageBitmap(f), c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height;
@@ -527,12 +519,12 @@
     document.documentElement.dataset.theme = t;
     const light = t === 'light';
     $('themeLabel').textContent = light ? 'Light mode' : 'Dark mode';
-    $('themeIcon').innerHTML = `<use href="#i-${light ? 'sun' : 'moon'}"/>`;
+    if ($('themeIcon')) $('themeIcon').textContent = '';
     SB.charts.redrawAll();
   }
   function initTheme() {
     let t = null; try { t = localStorage.getItem('stegobench-theme'); } catch (e) { /* storage blocked */ }
-    if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (!t) t = 'light';
     applyTheme(t);
     $('themeBtn').addEventListener('click', () => {
       const n = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';

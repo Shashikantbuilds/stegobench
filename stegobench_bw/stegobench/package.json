@@ -1,0 +1,21 @@
+{
+  "name": "stegobench",
+  "version": "2.0.0",
+  "description": "Image steganography benchmark portal - pure HTML/CSS/JS, runs in the browser",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "test": "node build.js && node tests/run-node.js",
+    "test:ui": "node build.js && node tests/ui-smoke.js",
+    "test:all": "npm test && npm run test:ui && npm run test:landing",
+    "validate": "node tests/validation-run.js 100",
+    "test:landing": "node tests/landing-check.js"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.0.11",
+    "jsdom": "^30.1.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

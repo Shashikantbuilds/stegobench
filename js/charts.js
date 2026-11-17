@@ -30,14 +30,15 @@
   }
   function frame(c, spec, xmap, ymin, ymax, xticks, yticks, m) {
     const { g, w, h } = c;
-    g.font = '12px Inter, "Segoe UI", system-ui, sans-serif';
-    g.strokeStyle = c.line; g.fillStyle = c.muted; g.lineWidth = 1;
+    g.font = '12px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
+    g.strokeStyle = c.line; g.fillStyle = c.muted; g.lineWidth = 1; g.setLineDash([2, 4]);
     g.textAlign = 'right'; g.textBaseline = 'middle';
     yticks.forEach((v) => {
       const y = m.t + (1 - (v - ymin) / (ymax - ymin)) * (h - m.t - m.b);
       g.beginPath(); g.moveTo(m.l, y); g.lineTo(w - m.r, y); g.stroke();
       g.fillText((spec.yfmt || fmtNum)(v), m.l - 8, y);
     });
+    g.setLineDash([]);
     g.textAlign = 'center'; g.textBaseline = 'top';
     xticks.forEach((t) => { const x = xmap(t.v); g.fillText(t.label, x, h - m.b + 7); });
     g.fillStyle = c.ink;
@@ -61,7 +62,7 @@
     if (spec.diag) { g.strokeStyle = c.muted; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(xmap(0), ymap(0)); g.lineTo(xmap(1), ymap(1)); g.stroke(); g.setLineDash([]); }
     const hits = [];
     spec.series.forEach((s) => {
-      g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = 2; g.setLineDash(s.dash ? [6, 4] : []);
+      g.strokeStyle = s.color; g.fillStyle = s.color; g.lineWidth = 2; g.setLineDash(SB.dashFor ? SB.dashFor(s.color, s.dash) : (s.dash ? [6, 4] : []));
       let pen = false;
       g.beginPath();
       s.points.forEach((p) => {
@@ -75,27 +76,48 @@
         const X = xmap(p.x), Y = ymap(p.y);
         if (p.e) { g.lineWidth = 1; g.beginPath(); g.moveTo(X, ymap(Math.max(ymin, p.y - p.e))); g.lineTo(X, ymap(Math.min(ymax, p.y + p.e))); g.stroke(); }
         if (!spec.noMarkers) { g.beginPath(); g.arc(X, Y, 3.2, 0, 7); g.fill(); }
-        hits.push({ X, Y, text: `${s.name}: ${spec.xcats ? spec.xcats[p.x] : (spec.xfmt || fmtNum)(p.x)} → ${(spec.yfmt || fmtNum)(+p.y.toFixed(2))}${p.e ? ' ±' + p.e.toFixed(1) : ''}` });
+        hits.push({ X, Y, text: `${s.name}: ${spec.xcats ? spec.xcats[p.x] : (spec.xfmt || fmtNum)(p.x)} : ${(spec.yfmt || fmtNum)(+p.y.toFixed(2))}${p.e ? ' ±' + p.e.toFixed(1) : ''}` });
       });
     });
     attachHover(canvas, hits);
   }
 
   /* spec: { points:[{x,y,r,color,label,ring}], xlabel, ylabel, xmin.. } axes default 0..100 */
+  /* trade-off map: filled = Pareto-optimal, hollow = beaten by another method; labels sit next to the points and are spread apart when they collide */
   function scatter(canvas, spec) {
-    const c = setup(canvas), { g, w, h } = c, m = { l: 52, r: 18, t: 14, b: 44 };
+    const c = setup(canvas), { g, w, h } = c, m = { l: 56, r: 28, t: 22, b: 48 };
     const xmin = spec.xmin != null ? spec.xmin : 0, xmax = spec.xmax != null ? spec.xmax : 100, ymin = spec.ymin != null ? spec.ymin : 0, ymax = spec.ymax != null ? spec.ymax : 100;
     const xmap = (v) => m.l + ((v - xmin) / (xmax - xmin)) * (w - m.l - m.r), ymap = (v) => m.t + (1 - (v - ymin) / (ymax - ymin)) * (h - m.t - m.b);
     frame(c, spec, xmap, ymin, ymax, niceTicks(xmin, xmax, 5).map((v) => ({ v, label: fmtNum(v) })), niceTicks(ymin, ymax, 5), m);
-    const hits = [];
-    spec.points.forEach((p) => {
-      const X = xmap(p.x), Y = ymap(p.y), r = p.r || 8;
-      g.fillStyle = p.color + 'cc'; g.beginPath(); g.arc(X, Y, r, 0, 7); g.fill();
-      if (p.ring) { g.strokeStyle = c.ink; g.lineWidth = 2; g.beginPath(); g.arc(X, Y, r + 3, 0, 7); g.stroke(); }
-      hits.push({ X, Y, text: p.label + (p.ring ? ' (Pareto-optimal)' : '') + ` – ${spec.xlabel}: ${p.x.toFixed(1)}, ${spec.ylabel}: ${p.y.toFixed(1)}` });
+    const accent = css('--blue', '#1f4d3a'), paper = css('--bg', '#f2eee3'), mono = 'ui-monospace, Menlo, Consolas, monospace';
+    g.font = '11px ' + mono; g.fillStyle = c.muted; g.textAlign = 'right'; g.textBaseline = 'top';
+    g.fillText('better: top right', w - m.r - 4, m.t + 4);
+    const hits = [], pts = spec.points.map((p) => ({ p, X: xmap(p.x), Y: ymap(p.y), r: Math.max(5, (p.r || 8) * 0.85) }));
+    pts.slice().sort((a, b) => b.r - a.r).forEach(({ p, X, Y, r }) => {
+      g.lineWidth = 2;
+      if (p.ring) { g.fillStyle = accent; g.strokeStyle = paper; g.beginPath(); g.arc(X, Y, r, 0, 7); g.fill(); g.stroke(); }
+      else { g.fillStyle = paper; g.strokeStyle = c.muted; g.beginPath(); g.arc(X, Y, r, 0, 7); g.fill(); g.stroke(); }
+      hits.push({ X, Y, text: p.label + (p.ring ? ' (Pareto-optimal)' : '') + ` | ${spec.xlabel}: ${p.x.toFixed(1)}, ${spec.ylabel}: ${p.y.toFixed(1)}` });
     });
-    g.font = '11px Inter, "Segoe UI", system-ui, sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = c.ink;
-    spec.points.forEach((p) => { const X = xmap(p.x), Y = ymap(p.y); const right = X < w - 120; g.textAlign = right ? 'left' : 'right'; g.fillText(p.short || '', X + (right ? 1 : -1) * ((p.r || 8) + 6), Y); });
+    /* labels: right of the point (left near the right edge), pushed apart vertically with a thin leader line */
+    g.font = '12px "Segoe UI", "Helvetica Neue", Arial, sans-serif'; g.textBaseline = 'middle';
+    const labs = pts.map((o) => { const t = o.p.short || '', tw = g.measureText(t).width, left = o.X + o.r + 8 + tw > w - 6; return { o, t, tw, left, y: o.Y, x: left ? o.X - o.r - 8 : o.X + o.r + 8 }; });
+    /* push a label away only from labels it overlaps horizontally; labels in the lower half move up, the others move down */
+    const spread = (list, dir) => {
+      const placed = [];
+      list.forEach((l) => {
+        const x0 = l.left ? l.x - l.tw : l.x, x1 = x0 + l.tw;
+        placed.forEach((q) => { const qx0 = q.left ? q.x - q.tw : q.x; if (x0 < qx0 + q.tw + 4 && qx0 < x1 + 4 && Math.abs(l.y - q.y) < 15) l.y = q.y + dir * 15; });
+        placed.push(l);
+      });
+    };
+    const mid = m.t + (h - m.t - m.b) / 2;
+    spread(labs.filter((l) => l.o.Y > mid).sort((p, q) => q.y - p.y), -1);
+    spread(labs.filter((l) => l.o.Y <= mid).sort((p, q) => p.y - q.y), 1);
+    labs.forEach((l) => {
+      if (Math.abs(l.y - l.o.Y) > 3) { g.strokeStyle = c.muted; g.lineWidth = 1; g.beginPath(); g.moveTo(l.left ? l.o.X - l.o.r : l.o.X + l.o.r, l.o.Y); g.lineTo(l.left ? l.x + 3 : l.x - 3, l.y); g.stroke(); }
+      g.fillStyle = l.o.p.ring ? c.ink : c.muted; g.textAlign = l.left ? 'right' : 'left'; g.fillText(l.t, l.x, l.y);
+    });
     attachHover(canvas, hits);
   }
 
@@ -120,5 +142,15 @@
   SB.charts = { draw, redrawAll() { live.forEach((c) => c.isConnected && c.offsetParent !== null && c._draw()); } };
   let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(SB.charts.redrawAll, 150); });
 
-  SB.METHOD_COLOR = { seqlsb: '#2f66e8', rndlsb: '#16a34a', lsbm: '#0891b2', suni: '#db2777', dct: '#7c3aed', dctvote: '#0d9488', spread: '#ea6a0c', dwt: '#b7791f' };
+  /* black-and-white theme: methods differ by gray level and by dash pattern (shade flips in dark mode) */
+  (function () {
+    const ids = ['seqlsb', 'rndlsb', 'lsbm', 'suni', 'dct', 'dctvote', 'spread', 'dwt'];
+    const light = ['#000000', '#555555', '#999999', '#000000', '#555555', '#999999', '#000000', '#555555'];
+    const dark = ['#ffffff', '#c4c4c4', '#8a8a8a', '#ffffff', '#c4c4c4', '#8a8a8a', '#ffffff', '#c4c4c4'];
+    const isDark = () => { const t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : !!(window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); };
+    SB.METHOD_COLOR = {}; SB.METHOD_DASH = {};
+    const dashes = [[], [6, 4], [2, 3], [10, 3, 2, 3], [], [6, 4], [2, 3], [10, 3, 2, 3]];
+    ids.forEach((id, i) => { Object.defineProperty(SB.METHOD_COLOR, id, { enumerable: true, get: () => (isDark() ? dark : light)[i] }); SB.METHOD_DASH[id] = dashes[i]; });
+    SB.dashFor = (color, flag) => { if (flag) return [6, 4]; const i = (isDark() ? dark : light).indexOf(color); return i < 0 ? [] : dashes[i]; };
+  })();
 })();

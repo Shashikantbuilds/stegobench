@@ -41,7 +41,7 @@ stegobench/
 | Attacks too easy | + **shift 3 px**, **rotate 1°**, **median**, **sharpen**, **WebP**, **double JPEG**, **social-media chain**; **breaking-point curves** for JPEG, noise, scale and shift |
 | No header / ECC | **Frame** (flags, length, CRC32) so a wrong key is *detected*; **Reed-Solomon** ECC applied to every method equally |
 | 32-bit numeric key | **Passphrase → PBKDF2-SHA256 (150 000 rounds)** → 128-bit position seed + **AES-256-GCM** payload encryption; file payloads up to 64 KB |
-| Weighted sum hid trade-offs | **Pareto-optimal** marker + trade-off map; goal presets kept |
+| Weighted sum hid trade-offs | **Pareto-optimal** marker marker; goal presets kept |
 | Main thread froze | **Web Workers** pool with automatic fallback; progress with ETA |
 | UI | dark mode, keyboard-accessible controls, tooltips, linked 5× inspector lens, reproducibility card (browser, image SHA-256, settings), CSV / JSON / PDF export |
 | No CI | `tests/` + GitHub Actions workflow |
